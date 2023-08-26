@@ -22,5 +22,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     Optional<ChatRoom> findChatRoomByChatRoomKey(String chatRoomKey);
 
+    @Query("select c from ChatRoom c where c.boardIdx = ?1")
+    Optional<ChatRoom> findChatRoomByBoardIdx(Board boardIdx);
+
     Page<ChatRoom> findAllProjectedByHostUserIdxOrSubUserIdxOrderByUpdatedAtDesc(User hostUserIdx, User subUserIdx, Pageable pageable);
 }

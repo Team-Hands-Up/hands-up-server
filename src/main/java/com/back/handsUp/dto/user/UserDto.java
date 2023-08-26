@@ -30,6 +30,7 @@ public class UserDto {
 
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     @Builder
     public static class ReqLogIn {
         @Email

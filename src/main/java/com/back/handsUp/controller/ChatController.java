@@ -25,10 +25,10 @@ public class ChatController {
     private final BoardService boardService;
     //채팅방 내 게시글 미리보기
     @ResponseBody
-    @GetMapping("/{chatRoomKey}")
-    public BaseResponse<ChatDto.ResBoardPreview> getPreViewBoard(Principal principal, @PathVariable String chatRoomKey){
+    @GetMapping("/{boardIdx}")
+    public BaseResponse<ChatDto.ResBoardPreview> getPreViewBoard(Principal principal, @PathVariable Long boardIdx){
         try {
-            ChatDto.ResBoardPreview boardPreview = this.chatService.getPreViewBoard(principal,chatRoomKey);
+            ChatDto.ResBoardPreview boardPreview = this.chatService.getPreViewBoard(principal,boardIdx);
             return new BaseResponse<>(boardPreview);
         }catch (BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
