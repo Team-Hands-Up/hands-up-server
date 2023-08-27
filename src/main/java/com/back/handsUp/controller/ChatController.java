@@ -84,10 +84,13 @@ public class ChatController {
         }
     }
 
-    @GetMapping("/check-key/{chatRoomKey}")
-    public BaseResponse<ChatDto.ResCheckKey> checkChatKeySaved(Principal principal, @RequestBody ChatDto.ReqCheckKey reqCheckKey, @PathVariable String chatRoomKey) {
+    @GetMapping("/check-key/{chatRoomKey}/{boardIdx}/{oppositeUserEmail}")
+    public BaseResponse<ChatDto.ResCheckKey> checkChatKeySaved(Principal principal,
+                                                               @PathVariable String chatRoomKey,
+                                                               @PathVariable Long boardIdx,
+                                                               @PathVariable String oppositeUserEmail) {
         try {
-            ChatDto.ResCheckKey result = chatService.checkChatKeySaved(principal, reqCheckKey, chatRoomKey);
+            ChatDto.ResCheckKey result = chatService.checkChatKeySaved(principal, boardIdx, oppositeUserEmail, chatRoomKey);
             return new BaseResponse<>(result);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
