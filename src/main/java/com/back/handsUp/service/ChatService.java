@@ -229,14 +229,14 @@ public class ChatService {
         }).collect(Collectors.toList());
     }
 
-    public ChatDto.ResCheckKey checkChatKeySaved(Principal principal, ChatDto.ReqCheckKey reqCheckKey) throws BaseException {
+    public ChatDto.ResCheckKey checkChatKeySaved(Principal principal, ChatDto.ReqCheckKey reqCheckKey, String chatRoomKey) throws BaseException {
         Optional<User> opOppositeUser = this.userRepository.findByEmailAndStatus(reqCheckKey.getOppositeUserEmail(), "ACTIVE");
         if (opOppositeUser.isEmpty()) {
             throw new BaseException(NON_EXIST_USERIDX);
         }
         User oppositeUser = opOppositeUser.get();
 
-        Optional<ChatRoom> optionalChatRoom = this.chatRoomRepository.findChatRoomByChatRoomKey(reqCheckKey.getChatRoomKey());
+        Optional<ChatRoom> optionalChatRoom = this.chatRoomRepository.findChatRoomByChatRoomKey(chatRoomKey);
         Optional<Board> opBoard = this.boardRepository.findByBoardIdx(reqCheckKey.getBoardIdx());
         if (opBoard.isEmpty()) {
             throw new BaseException(NON_EXIST_BOARDIDX);

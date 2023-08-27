@@ -59,7 +59,6 @@ public class ChatDto {
     @Builder
     @Getter
     public static class ReqCheckKey {
-        private String chatRoomKey;
         private Long boardIdx;
         private String oppositeUserEmail;
     }
