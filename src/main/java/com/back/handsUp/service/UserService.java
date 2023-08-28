@@ -67,7 +67,7 @@ public class UserService {
     private final NotificationRepository notificationRepository;
 
     public void signupUser(UserDto.ReqSignUp user) throws BaseException {
-        Optional<User> emailCheck = userRepository.findByEmail(user.getEmail());
+        Optional<User> emailCheck = userRepository.findByEmailAndStatus(user.getEmail(), "ACTIVE");
         if (emailCheck.isPresent()) {
             throw new BaseException(EXIST_USER);
         }

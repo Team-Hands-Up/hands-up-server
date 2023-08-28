@@ -60,6 +60,16 @@ public class BoardDto {
     }
 
     @Builder
+    public static class GetBoardListWithPage {
+        @JsonProperty
+        private String schoolName;
+        @JsonProperty
+        private int totalPage;
+        @JsonProperty
+        private List<BoardWithTag> getBoardList;
+    }
+
+    @Builder
     @Getter
     public static class BoardWithTag {
         private Board board;

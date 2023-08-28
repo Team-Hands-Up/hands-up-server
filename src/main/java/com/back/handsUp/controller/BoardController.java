@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,10 +37,10 @@ public class BoardController {
 
     //전체 게시물 조회
     @ResponseBody
-    @RequestMapping("/showList")
-    public BaseResponse<BoardDto.GetBoardList> showBoardList(Principal principal, Pageable pageable){
+    @RequestMapping("/showList/{page}")
+    public BaseResponse<BoardDto.GetBoardListWithPage> showBoardList(Principal principal, @PathVariable("page") int page){
         try {
-            BoardDto.GetBoardList getBoards = boardService.showBoardList(principal, pageable);
+            BoardDto.GetBoardListWithPage getBoards = boardService.showBoardList(principal, page);
             return new BaseResponse<>(getBoards);
         }catch (BaseException exception){
             return new BaseResponse<>((exception.getStatus()));

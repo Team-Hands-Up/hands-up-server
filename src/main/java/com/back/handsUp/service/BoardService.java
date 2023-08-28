@@ -33,7 +33,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.back.handsUp.baseResponse.BaseResponseStatus.*;
 
@@ -116,7 +115,7 @@ public class BoardService {
     }
 
     //전체 게시물 조회
-    public BoardDto.GetBoardList showBoardList(Principal principal, Pageable pageable) throws BaseException {
+    public BoardDto.GetBoardListWithPage showBoardList(Principal principal, int page) throws BaseException {
 
         //학교 이름으로 찾기
 //        Optional<School> optionalSchool = schoolRepository.findByName(schoolName);
@@ -133,15 +132,7 @@ public class BoardService {
         }
         User user = optionalUser.get();
 
-        List<BoardDto.BoardWithTag> getBoards = getBoards(principal, user.getSchoolIdx());
-
-        BoardDto.GetBoardList getBoardList = BoardDto.GetBoardList.builder()
-                .schoolName(user.getSchoolIdx().getName())
-                .getBoardList(getBoards)
-                .build();
-
-        return getBoardList;
-
+        return getBoardsWithPage(principal, user.getSchoolIdx(), page);
     }
 
 
@@ -164,7 +155,7 @@ public class BoardService {
         }
         User user = optionalUser.get();
 
-        List<BoardDto.BoardWithTag> getBoards = getBoards(principal, user.getSchoolIdx());
+        List<BoardDto.BoardWithTag> getBoards = getBoardsWithOutPage(principal, user.getSchoolIdx());
 
         List<BoardDto.GetBoardMap> getBoardsMapList = new ArrayList<>();
 
@@ -198,7 +189,7 @@ public class BoardService {
     }
 
     //게시물 조회 리스트,지도 중복 코드
-    public List<BoardDto.BoardWithTag> getBoards(Principal principal, School school) throws BaseException {
+    public BoardDto.GetBoardListWithPage getBoardsWithPage(Principal principal, School school, int page) throws BaseException {
         //조회하는 유저
         Optional<User> optionalUser = userRepository.findByEmailAndStatus(principal.getName(), "ACTIVE");
 
@@ -212,79 +203,115 @@ public class BoardService {
 
         // 학교 상관 없이 모든 게시물
         List<BoardUser> getSchoolBoards = boardUserRepository.findBoardUserByStatus("ACTIVE");
+        log.info("getSchoolBoards size={}", getSchoolBoards.size());
 
         List<BoardDto.BoardWithTag> getBoards = new ArrayList<>();
-        List<Board> blockedBoard = new ArrayList<>();
 
         LocalDateTime currentTime = LocalDateTime.now();
 
-
-        for (BoardUser b: getSchoolBoards){
+        for (BoardUser b: getSchoolBoards) {
             //시간 만료 체크
-            Duration timeCheck = Duration.between(b.getBoardIdx().getCreatedAt(),currentTime);
+            Duration timeCheck = Duration.between(b.getBoardIdx().getCreatedAt(), currentTime);
 //            log.info("timecheck={}",timeCheck.getSeconds());
-            if(timeCheck.getSeconds() > b.getBoardIdx().getMessageDuration() * 3600L) {
+            if (timeCheck.getSeconds() > b.getBoardIdx().getMessageDuration() * 3600L) {
                 b.getBoardIdx().changeStatus("EXPIRED");
             }
+        }
+        // 페이지 1부터 시작
+        PageRequest pageRequest = PageRequest.of(page-1, 10);
+        //차단 체크
+        Page<BoardUser> nonBlockBoardsWithPage = boardUserRepository.findNotBlockedBoardsByUserIdxWithPage(user, pageRequest);
 
-            Optional<BoardUser> optional = this.boardUserRepository.findBoardUserByBoardIdxAndStatus(b.getBoardIdx(), "WRITE").stream().findFirst();
-            if (optional.isEmpty()) {
-                throw new BaseException(BaseResponseStatus.NON_EXIST_BOARDUSERIDX);
+        List<BoardUser> nonBlockBoards = nonBlockBoardsWithPage.getContent();
+
+        addGetBoards(user, getBoards, nonBlockBoards);
+
+        return BoardDto.GetBoardListWithPage.builder()
+                .getBoardList(getBoards)
+                .totalPage(nonBlockBoardsWithPage.getTotalPages())
+                .schoolName(user.getSchoolIdx().getName())
+                .build();
+
+    }
+
+    public List<BoardDto.BoardWithTag> getBoardsWithOutPage(Principal principal, School school) throws BaseException {
+        //조회하는 유저
+        Optional<User> optionalUser = userRepository.findByEmailAndStatus(principal.getName(), "ACTIVE");
+
+        if (optionalUser.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.NON_EXIST_EMAIL);
+        }
+        User user = optionalUser.get();
+
+        // 같은 학교의 게시물만 조회 시
+//        List<BoardUser> getSchoolBoards = boardUserRepository.findBoardBySchoolAndStatus(school, "ACTIVE");
+
+        // 학교 상관 없이 모든 게시물
+        List<BoardUser> getSchoolBoards = boardUserRepository.findBoardUserByStatus("ACTIVE");
+        log.info("getSchoolBoards size={}", getSchoolBoards.size());
+
+        List<BoardDto.BoardWithTag> getBoards = new ArrayList<>();
+
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        for (BoardUser b: getSchoolBoards) {
+            //시간 만료 체크
+            Duration timeCheck = Duration.between(b.getBoardIdx().getCreatedAt(), currentTime);
+//            log.info("timecheck={}",timeCheck.getSeconds());
+            if (timeCheck.getSeconds() > b.getBoardIdx().getMessageDuration() * 3600L) {
+                b.getBoardIdx().changeStatus("EXPIRED");
             }
-            BoardUser boardUser = optional.get();
+        }
+        //차단 체크
+        List<BoardUser> nonBlockBoards = boardUserRepository.findNotBlockedBoardsByUserIdx(user);
 
-            Character character = boardUser.getUserIdx().getCharacter();
+        addGetBoards(user, getBoards, nonBlockBoards);
+
+        return getBoards;
+    }
+
+    private void addGetBoards(User user, List<BoardDto.BoardWithTag> getBoards, List<BoardUser> nonBlockBoards) {
+        for(BoardUser b1: nonBlockBoards){
+
+            Character character = b1.getUserIdx().getCharacter();
             CharacterDto.GetCharacterInfo characterInfo = new CharacterDto.GetCharacterInfo(character.getEye(),
                     character.getEyeBrow(), character.getGlasses(), character.getNose(), character.getMouth(),
                     character.getHair(), character.getHairColor(), character.getSkinColor(), character.getBackGroundColor());
 
+            Board shownBoard = b1.getBoardIdx();
 
-            //차단 체크
-            if(b.getUserIdx()==user && b.getStatus().equals("BLOCK")){
-                blockedBoard.add(b.getBoardIdx());
-            }else{
-                if(!getBoards.contains(b.getBoardIdx()) && b.getBoardIdx().getStatus().equals("ACTIVE")){
-                    Board shownBoard = b.getBoardIdx();
+            String tagName;
 
-                    String tagName;
+            Optional<String> opTagName = this.boardTagRepository.findTagNameByBoard(shownBoard);
+            if (opTagName.isEmpty()) {
+                tagName = null;
+            }else tagName = opTagName.get();
 
-                    Optional<String> opTagName = this.boardTagRepository.findTagNameByBoard(shownBoard);
-                    if (opTagName.isEmpty()) {
-                        tagName = null;
-                    }else tagName = opTagName.get();
-
-                    //like 확인
-                    Optional<BoardUser> opBoard = boardUserRepository.findBoardUserByBoardIdxAndUserIdx(shownBoard, user);
-                    String didLike;
-                    if(opBoard.isEmpty()){
-                        didLike = "false";
-                    }else {
-                        BoardUser boardUserEntity = opBoard.get();
-                        didLike = boardUserEntity.getStatus();
-                    }
-                    //like 눌렀을 때만 true 반환
-                    if (Objects.equals(didLike, "LIKE")) {
-                        didLike = "true";
-                    }
-
-                    BoardDto.BoardWithTag boardWithTag = BoardDto.BoardWithTag.builder()
-                            .board(shownBoard)
-                            .nickname(boardUser.getUserIdx().getNickname())
-                            .character(characterInfo)
-                            .tag(tagName)
-                            .schoolName(boardUser.getUserIdx().getSchoolIdx().getName()) // todo : 초기 앱 런칭에만 삽입
-                            .didLike(didLike)
-                            .build();
-
-                    getBoards.add(boardWithTag);
-                }
+            //like 확인
+            Optional<BoardUser> opBoard = boardUserRepository.findBoardUserByBoardIdxAndUserIdx(shownBoard, user);
+            String didLike;
+            if(opBoard.isEmpty()){
+                didLike = "false";
+            }else {
+                BoardUser boardUserEntity = opBoard.get();
+                didLike = boardUserEntity.getStatus();
             }
+            //like 눌렀을 때만 true 반환
+            if (Objects.equals(didLike, "LIKE")) {
+                didLike = "true";
+            }
+
+            BoardDto.BoardWithTag boardWithTag = BoardDto.BoardWithTag.builder()
+                    .board(shownBoard)
+                    .nickname(b1.getUserIdx().getNickname())
+                    .character(characterInfo)
+                    .tag(tagName)
+                    .schoolName(b1.getUserIdx().getSchoolIdx().getName()) // todo : 초기 앱 런칭에만 삽입
+                    .didLike(didLike)
+                    .build();
+
+            getBoards.add(boardWithTag);
         }
-
-        getBoards.removeAll(blockedBoard);
-
-
-        return getBoards;
     }
 
     public String likeBoard(Principal principal, Long boardIdx) throws BaseException {

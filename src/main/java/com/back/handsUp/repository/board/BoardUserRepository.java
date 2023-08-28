@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +32,12 @@ public interface BoardUserRepository extends JpaRepository<BoardUser, Long> {
 
     @Query("select b from BoardUser b where b.boardIdx.status = ?1")
     List<BoardUser> findBoardUserByStatus(String status);
+
+    @Query("select b from BoardUser b where b.boardIdx.status = 'ACTIVE' and b.status= 'WRITE' and b.boardIdx not in (select bu.boardIdx from BoardUser bu where bu.userIdx =?1 and bu.status='BLOCK') order by b.boardUserIdx desc")
+    List<BoardUser> findNotBlockedBoardsByUserIdx(User userIdx);
+
+    @Query("select b from BoardUser b where b.boardIdx.status = 'ACTIVE' and b.status= 'WRITE' and b.boardIdx not in (select bu.boardIdx from BoardUser bu where bu.userIdx =?1 and bu.status='BLOCK') order by b.boardUserIdx desc")
+    Page<BoardUser> findNotBlockedBoardsByUserIdxWithPage(User userIdx, Pageable page);
 
     List<BoardUser> findBoardUserByBoardIdxAndStatus(Board boardIdx, String status);
 
