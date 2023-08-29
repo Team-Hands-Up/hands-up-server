@@ -54,6 +54,7 @@ public class ChatDto {
         private String lastContent;
         private String lastSenderEmail;
         private int notRead;
+        private String oppositeEmail;
     }
 
     @AllArgsConstructor
@@ -86,6 +87,6 @@ public class ChatDto {
     public static class ResSendChat {
         private String email;
         private String chatContent;
-        private Long chatRoomIdx;
+        private String chatRoomKey;
     }
 }

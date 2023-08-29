@@ -129,7 +129,7 @@ public class ChatService {
         }
         User me = optionalMe.get();
 
-        Optional<ChatRoom> opChatRoom = chatRoomRepository.findByChatRoomIdx(sendChat.getChatRoomIdx());
+        Optional<ChatRoom> opChatRoom = chatRoomRepository.findChatRoomByChatRoomKey(sendChat.getChatRoomKey());
         String chatContent = sendChat.getChatContent();
         if (opChatRoom.isEmpty()) {
             throw new BaseException(NON_EXIST_CHATROOMIDX);
@@ -235,9 +235,11 @@ public class ChatService {
             if (Objects.equals(hostUser.getUserIdx(), user.getUserIdx())) {
                 chatRoomDto.setCharacter(subUser.getCharacter());
                 chatRoomDto.setNickname(subUser.getNickname());
+                chatRoomDto.setOppositeEmail(subUser.getEmail());
             } else {
                 chatRoomDto.setCharacter(hostUser.getCharacter());
                 chatRoomDto.setNickname(hostUser.getNickname());
+                chatRoomDto.setOppositeEmail(hostUser.getEmail());
             }
 
             return chatRoomDto;
