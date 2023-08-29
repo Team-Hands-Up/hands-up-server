@@ -16,6 +16,7 @@ public class ChatDto {
     @Builder
     public static class ResBoardPreview {
         private Board board;
+        private String tag;
         private Character character;
         private String nickname;
     }
@@ -72,6 +73,7 @@ public class ChatDto {
         private Board board;
         private Character character;
         private String nickname;
+        private String writerEmail;
         private Boolean isSaved;
     }
 

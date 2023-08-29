@@ -15,6 +15,7 @@ import com.back.handsUp.dto.chat.ChatDto;
 import com.back.handsUp.dto.user.UserDto;
 import com.back.handsUp.repository.NotificationRepository;
 import com.back.handsUp.repository.board.BoardRepository;
+import com.back.handsUp.repository.board.BoardTagRepository;
 import com.back.handsUp.repository.board.BoardUserRepository;
 import com.back.handsUp.repository.chat.ChatRoomRepository;
 import com.back.handsUp.repository.fcm.FcmTokenRepository;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ public class ChatService {
     private final BoardService boardService;
     private final FcmTokenRepository fcmTokenRepository;
     private final FirebaseCloudMessageService firebaseCloudMessageService;
+    private final BoardTagRepository boardTagRepository;
 
     private final NotificationRepository notificationRepository;
     //채팅방 내 게시물 미리보기
@@ -63,6 +66,9 @@ public class ChatService {
             throw new BaseException(BaseResponseStatus.NON_EXIST_BOARDIDX);
         }
         Board board = boardOptional.get();
+
+        //태그 가져오기
+        String tagName = this.boardTagRepository.findTagNameByBoard(board).orElse(null);
 
 //        Optional<ChatRoom> optional1 = this.chatRoomRepository.findChatRoomByChatRoomKey(chatRoomKey);
 //        Optional<ChatRoom> optional1 = this.chatRoomRepository.findChatRoomByBoardIdx(board);
@@ -85,6 +91,7 @@ public class ChatService {
 
         ChatDto.ResBoardPreview boardPreview = ChatDto.ResBoardPreview.builder()
                 .board(board)
+                .tag(tagName)
                 .character(loginUser.getCharacter())
                 .nickname(boardUser.getUserIdx().getNickname())
                 .build();
@@ -246,11 +253,18 @@ public class ChatService {
         }
         Board board = opBoard.get();
 
+        //opWriter - 게시물 작성자
+        Optional<User> opWriter = boardUserRepository.findUserIdxByBoardIdxAndStatus(boardIdx, "WRITE");
+        if (opWriter.isEmpty()) {
+            throw new BaseException(NON_EXIST_USERIDX);
+        }
+        User writer = opWriter.get();
 
         ChatDto.ResCheckKey result = ChatDto.ResCheckKey.builder()
                 .isSaved(optionalChatRoom.isPresent())
                 .board(board)
                 .character(oppositeUser.getCharacter())
+                .writerEmail(writer.getEmail())
                 .nickname(oppositeUser.getNickname()).build();
 
         return result;
