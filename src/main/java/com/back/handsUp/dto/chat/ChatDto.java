@@ -18,6 +18,7 @@ public class ChatDto {
         private Board board;
         private String tag;
         private Character character;
+        private String writerEmail;
         private String nickname;
     }
 

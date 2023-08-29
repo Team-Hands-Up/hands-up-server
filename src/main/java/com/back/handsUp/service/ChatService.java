@@ -70,6 +70,13 @@ public class ChatService {
         //태그 가져오기
         String tagName = this.boardTagRepository.findTagNameByBoard(board).orElse(null);
 
+        //opWriter - 게시물 작성자
+        Optional<User> opWriter = boardUserRepository.findUserIdxByBoardIdxAndStatus(boardIdx, "WRITE");
+        if (opWriter.isEmpty()) {
+            throw new BaseException(NON_EXIST_USERIDX);
+        }
+        User writer = opWriter.get();
+
 //        Optional<ChatRoom> optional1 = this.chatRoomRepository.findChatRoomByChatRoomKey(chatRoomKey);
 //        Optional<ChatRoom> optional1 = this.chatRoomRepository.findChatRoomByBoardIdx(board);
 //        if(optional1.isEmpty()){
@@ -93,6 +100,7 @@ public class ChatService {
                 .board(board)
                 .tag(tagName)
                 .character(loginUser.getCharacter())
+                .writerEmail(writer.getEmail())
                 .nickname(boardUser.getUserIdx().getNickname())
                 .build();
 
