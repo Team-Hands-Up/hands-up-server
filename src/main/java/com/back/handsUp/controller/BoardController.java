@@ -37,10 +37,10 @@ public class BoardController {
 
     //전체 게시물 조회
     @ResponseBody
-    @RequestMapping("/showList/{page}")
-    public BaseResponse<BoardDto.GetBoardListWithPage> showBoardList(Principal principal, @PathVariable("page") int page){
+    @RequestMapping("/showList")
+    public BaseResponse<BoardDto.GetBoardList> showBoardList(Principal principal){
         try {
-            BoardDto.GetBoardListWithPage getBoards = boardService.showBoardList(principal, page);
+            BoardDto.GetBoardList getBoards = boardService.showBoardList(principal);
             return new BaseResponse<>(getBoards);
         }catch (BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
