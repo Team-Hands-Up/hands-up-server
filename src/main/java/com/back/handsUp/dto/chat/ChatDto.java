@@ -37,7 +37,7 @@ public class ChatDto {
     @Getter
     @Setter
     public static class ReadChat {
-        private Long chatRoomIdx;
+        private String chatRoomKey;
     }
 
     @AllArgsConstructor
@@ -48,6 +48,7 @@ public class ChatDto {
     public static class ResChatList {
         private Long chatRoomIdx;
         private String chatRoomKey;
+        private Long boardIdx;
         private Character character;
         private String nickname;
         private LocalDateTime updatedAt;

@@ -29,7 +29,7 @@ public enum BaseResponseStatus {
     NON_EXIST_SCHOOLIDX(false, 4014, "학교 인덱스가 존재하지 않습니다."),
     NON_EXIST_BOARDUSERIDX(false, 4015, "유저가 작성한 게시물이 아닙니다."),
     NON_EXIST_BOARD_LIST(false, 4016, "게시물이 존재하지 않습니다."),
-    NON_EXIST_CHATROOMIDX(false, 4017, "채팅방이 존재하지 않습니다."),
+    NON_EXIST_CHATROOMKEY(false, 4017, "채팅방이 존재하지 않습니다."),
     ALREADY_DELETE_USER(false, 4017, "이미 탈퇴한 회원입니다."),
     NON_CORRESPOND_USER(false, 4018, "userIdx가 로그인한 유저와 일치하지 않습니다."),
     NON_EXIST_SCHOOLNAME(false, 4019, "학교명이 존재하지 않습니다."),

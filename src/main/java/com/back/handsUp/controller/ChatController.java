@@ -106,4 +106,14 @@ public class ChatController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    @DeleteMapping("/{chatRoomKey}")
+    public BaseResponse<String> deleteChatRoom(Principal principal, @PathVariable String chatRoomKey){
+        try {
+            chatService.deleteChatRoom(principal, chatRoomKey);
+            return new BaseResponse<>("chatRoomKey가 "+chatRoomKey+"인 채팅방이 삭제되었습니다.");
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }

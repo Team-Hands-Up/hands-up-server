@@ -110,7 +110,7 @@ public class ChatService {
     public String blockChatAndBoards(Principal principal, Long chatRoomIdx) throws BaseException {
         Optional<ChatRoom> optionalChatRoom = chatRoomRepository.findByChatRoomIdx(chatRoomIdx);
         if(optionalChatRoom.isEmpty()){
-            throw new BaseException(BaseResponseStatus.NON_EXIST_CHATROOMIDX);
+            throw new BaseException(BaseResponseStatus.NON_EXIST_CHATROOMKEY);
         }
 
         ChatRoom chatRoom = optionalChatRoom.get();
@@ -132,7 +132,7 @@ public class ChatService {
         Optional<ChatRoom> opChatRoom = chatRoomRepository.findChatRoomByChatRoomKey(sendChat.getChatRoomKey());
         String chatContent = sendChat.getChatContent();
         if (opChatRoom.isEmpty()) {
-            throw new BaseException(NON_EXIST_CHATROOMIDX);
+            throw new BaseException(NON_EXIST_CHATROOMKEY);
         }
         ChatRoom chatRoom = opChatRoom.get();
         chatRoom.changeLastContent(chatContent, me);
@@ -222,6 +222,7 @@ public class ChatService {
 
             chatRoomDto.setChatRoomIdx(chatRoom.getChatRoomIdx());
             chatRoomDto.setChatRoomKey(chatRoom.getChatRoomKey());
+            chatRoomDto.setBoardIdx(chatRoom.getBoardIdx().getBoardIdx());
             chatRoomDto.setUpdatedAt(chatRoom.getUpdatedAt());
             chatRoomDto.setNotRead(chatRoom.getNotRead());
             if (chatRoom.getLastChatContent()==null) {
@@ -281,15 +282,15 @@ public class ChatService {
     }
 
     public String readChat(Principal principal, ChatDto.ReadChat resRead) throws BaseException{
-        log.info("chat room idx = {}", resRead.getChatRoomIdx());
+        log.info("chat room key = {}", resRead.getChatRoomKey());
         Optional<User> opMe = userRepository.findByEmailAndStatus(principal.getName(), "ACTIVE");
         if (opMe.isEmpty()) {
             throw new BaseException(NON_EXIST_USERIDX);
         }
         User me = opMe.get();
-        Optional<ChatRoom> opChatRoom = chatRoomRepository.findByChatRoomIdx(resRead.getChatRoomIdx());
+        Optional<ChatRoom> opChatRoom = chatRoomRepository.findChatRoomByChatRoomKey(resRead.getChatRoomKey());
         if (opChatRoom.isEmpty()) {
-            throw new BaseException(NON_EXIST_CHATROOMIDX);
+            throw new BaseException(NON_EXIST_CHATROOMKEY);
         }
         ChatRoom chatRoom = opChatRoom.get();
 
@@ -298,6 +299,30 @@ public class ChatService {
         }else {
             chatRoom.read();
             return "채팅을 읽었습니다.";
+        }
+    }
+
+    public void deleteChatRoom(Principal principal, String chatRoomKey) throws BaseException {
+        //유저 존재 확인
+        Optional<User> opMe = userRepository.findByEmailAndStatus(principal.getName(), "ACTIVE");
+        if (opMe.isEmpty()) {
+            throw new BaseException(NON_EXIST_USERIDX);
+        }
+        User me = opMe.get();
+
+        //채팅방 존재 확인
+        Optional<ChatRoom> opDeleteRoom = chatRoomRepository.findChatRoomByChatRoomKey(chatRoomKey);
+        if(opDeleteRoom.isEmpty()){
+            throw new BaseException(NON_EXIST_CHATROOMKEY);
+        }
+        //삭제될 채팅방
+        ChatRoom deleteRoom = opDeleteRoom.get();
+        
+        //유저가 채팅방에 존재하면 채팅방 삭제
+        if(deleteRoom.getHostUserIdx() == me || deleteRoom.getSubUserIdx() == me){
+            chatRoomRepository.delete(deleteRoom);
+        } else {
+            throw new BaseException(NON_EXIST_CHATROOM_USER);
         }
     }
 }
