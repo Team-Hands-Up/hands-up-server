@@ -99,7 +99,7 @@ public class ChatService {
         ChatDto.ResBoardPreview boardPreview = ChatDto.ResBoardPreview.builder()
                 .board(board)
                 .tag(tagName)
-                .character(loginUser.getCharacter())
+                .character(writer.getCharacter())
                 .writerEmail(writer.getEmail())
                 .nickname(boardUser.getUserIdx().getNickname())
                 .build();
@@ -160,6 +160,7 @@ public class ChatService {
                 .build();
         try {
             notificationRepository.save(notificationEntity);
+            log.info("세이브 완={}", "complete");
             firebaseCloudMessageService.sendMessageTo(fcmToken.getFcmToken(), me.getNickname(), "채팅이 도착하였습니다.");
             return "채팅 알림을 성공적으로 보냈습니다.";
         } catch (Exception e) {
