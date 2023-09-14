@@ -63,6 +63,12 @@ public class BoardController {
     public BaseResponse<String> like(Principal principal,@PathVariable Long boardIdx) {
         try{
             String str = this.boardService.likeBoard(principal, boardIdx);
+
+            //좋아요 알림 전송 실패 케이스 분리
+            if(str.equals("해당 게시글에 좋아요를 눌렀지만 알림 전송에는 실패했습니다.")){
+                return new BaseResponse(false, 5003, str);
+            }
+
             return new BaseResponse<>(str);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());

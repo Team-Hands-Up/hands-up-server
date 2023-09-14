@@ -334,7 +334,8 @@ public class BoardService {
             } catch (Exception e) {
                 e.printStackTrace();
                 log.info("ERROR MESSAGE : {}", e.getMessage());
-                throw new BaseException(BaseResponseStatus.PUSH_NOTIFICATION_SEND_ERROR);
+                return "해당 게시글에 좋아요를 눌렀지만 알림 전송에는 실패했습니다.";
+//                throw new BaseException(BaseResponseStatus.PUSH_NOTIFICATION_SEND_ERROR);
             }
         }
         return "해당 게시글에 좋아요를 눌렀습니다.";
