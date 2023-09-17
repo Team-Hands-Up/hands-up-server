@@ -177,22 +177,42 @@ public class ChatService {
         if (optionalMe.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_EMAIL);
         }
-        //채팅방을 개설할 때는 사용자가 게시글 작성자에게 채팅을 보냄 -> 개설자는 항상 참여자, 작성자는 항상 호스트.
-        User subUser = optionalMe.get();
 
+        User hostUser = optionalMe.get();
+        User subUser;
         Long boardIdx = reqCreateChat.getBoardIdx();
-
         Optional<Board> optionalBoard = this.boardRepository.findByBoardIdx(boardIdx);
         if (optionalBoard.isEmpty()) {
             throw new BaseException(NON_EXIST_BOARDIDX);
         }
         Board board = optionalBoard.get();
 
-        Optional<User> optionalHostUser = this.boardUserRepository.findUserIdxByBoardIdxAndStatus(boardIdx, "WRITE");
-        if (optionalHostUser.isEmpty()) {
-            throw new BaseException(NON_EXIST_USERIDX);
+        /**
+         * 게시물에서 채팅 보내기 버튼 : 작성자가 아닌 사람이 채팅방 생성
+         * 좋아요 알림에서 채팅 보내기 버튼: 작성자가 채팅방 생성
+         * 채팅방 생성한 사람 = me = hostUser
+         * subUser = 게시글 작성자 or 좋아요 누른 사람
+         * 프론트에서 채팅방을 생성하려는 사람 == 게시글 작성자일 때 oppositeEmail을 보내줌
+         **/
+
+        //hostUser = me, subUser = 게시글 작성자
+        if(reqCreateChat.getOppositeEmail() == null){
+            Optional<User> optionalHostUser = this.boardUserRepository.findUserIdxByBoardIdxAndStatus(boardIdx, "WRITE");
+            if (optionalHostUser.isEmpty()) {
+                throw new BaseException(NON_EXIST_USERIDX);
+            }
+            subUser = optionalHostUser.get();
         }
-        User hostUser = optionalHostUser.get();
+        //hostUser = me, subUser = 좋아요 누른 사람(request의 oppositeEmail로 찾기)
+        else {
+            String oppositeEmail = reqCreateChat.getOppositeEmail();
+            Optional<User> optionalSub = userRepository.findByEmailAndStatus(oppositeEmail, "ACTIVE");
+
+            if (optionalSub.isEmpty()) {
+                throw new BaseException(BaseResponseStatus.NON_EXIST_EMAIL);
+            }
+            subUser = optionalSub.get();
+        }
 
         if(subUser.getUserIdx() == hostUser.getUserIdx()){
             throw new BaseException(SELF_CHAT_ERROR);

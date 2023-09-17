@@ -29,6 +29,7 @@ public class ChatDto {
     public static class ReqCreateChat {
         private Long boardIdx;
         private String chatRoomKey;
+        private String oppositeEmail;
     }
 
     @AllArgsConstructor
