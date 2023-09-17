@@ -52,7 +52,7 @@ jobs:
       - run: echo "${{ secrets.FIREBASE_SECRET_KEY }}" > ./src/main/resources/firebase/handsup-9c9e7-firebase-adminsdk-ow0l5-6bb4cd6c8c.json
       - run: cat ./src/main/resources/firebase/handsup-9c9e7-firebase-adminsdk-ow0l5-6bb4cd6c8c.json
       - run: touch ./src/main/resources/application.properties
-      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+      - run: echo "${{ secrets.PROPERTIES }}" > ./src/main/resources/application.properties
       - run: cat ./src/main/resources/application.properties
       
       # (3) Gradle build (Test 제외)
