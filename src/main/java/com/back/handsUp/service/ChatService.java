@@ -96,6 +96,14 @@ public class ChatService {
         }
         BoardUser boardUser = optional2.get();
 
+        //차단 확인
+        Optional<BoardUser> blockBoard = this.boardUserRepository.findBoardUserByBoardIdxAndStatus(board, "BLOCK")
+                .stream().findFirst();
+
+        if(blockBoard.isPresent()){
+            throw new BaseException(BaseResponseStatus.BLOCKED_BOARD_ERROR);
+        }
+
         ChatDto.ResBoardPreview boardPreview = ChatDto.ResBoardPreview.builder()
                 .board(board)
                 .tag(tagName)
