@@ -20,6 +20,7 @@ public class ChatDto {
         private Character character;
         private String writerEmail;
         private String nickname;
+        private String schoolName;
     }
 
     @AllArgsConstructor

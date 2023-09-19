@@ -7,10 +7,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -18,7 +19,7 @@ import java.util.List;
 @Table(name = "chat_room")
 @NoArgsConstructor
 @DynamicInsert
-public class ChatRoom extends BaseEntity {
+public class ChatRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatRoomIdx;
@@ -49,6 +50,14 @@ public class ChatRoom extends BaseEntity {
     @JoinColumn(name = "lastSender")
     private User lastSender;
 
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    //lastChatContent가 변경될 때만 updatedAt 변경하기 위해 BaseEntity 상속 안함
+    @CreationTimestamp
+    private LocalDateTime updatedAt;
+
     @Builder
     public ChatRoom(Board boardIdx, User subUserIdx, User hostUserIdx, String chatRoomKey) {
         this.boardIdx = boardIdx;
@@ -60,6 +69,7 @@ public class ChatRoom extends BaseEntity {
     public void changeLastContent(String lastChatContent, User lastSender) {
         this.lastChatContent = lastChatContent;
         this.lastSender = lastSender;
+        this.updatedAt = LocalDateTime.now();
     }
 
     public void plusNotRead() {

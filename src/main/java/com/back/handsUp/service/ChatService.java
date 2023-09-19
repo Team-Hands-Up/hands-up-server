@@ -89,16 +89,8 @@ public class ChatService {
 //            throw new BaseException(BaseResponseStatus.NON_EXIST_CHATROOM_USER);
 //        }
 
-        Optional<BoardUser> optional2 = this.boardUserRepository.findBoardUserByBoardIdxAndStatus(board, "WRITE")
-                .stream().findFirst();
-        if(optional2.isEmpty()){
-            throw new BaseException(BaseResponseStatus.NON_EXIST_BOARDUSERIDX);
-        }
-        BoardUser boardUser = optional2.get();
-
         //차단 확인
-        Optional<BoardUser> blockBoard = this.boardUserRepository.findBoardUserByBoardIdxAndStatus(board, "BLOCK")
-                .stream().findFirst();
+        Optional<BoardUser> blockBoard = this.boardUserRepository.findByUserIdxAndBoardIdxAndStatus(loginUser, board, "BLOCK");
 
         if(blockBoard.isPresent()){
             throw new BaseException(BaseResponseStatus.BLOCKED_BOARD_ERROR);
@@ -109,7 +101,8 @@ public class ChatService {
                 .tag(tagName)
                 .character(writer.getCharacter())
                 .writerEmail(writer.getEmail())
-                .nickname(boardUser.getUserIdx().getNickname())
+                .nickname(writer.getNickname())
+                .schoolName(writer.getSchoolIdx().getName())
                 .build();
 
         return boardPreview;
