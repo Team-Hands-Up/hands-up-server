@@ -112,7 +112,7 @@ public class BoardDto {
         private Long boardIdx;
         private String emailFrom;
         private LocalDateTime LikeCreatedAt;
-        private String text;
+        private String nickname;
         private String boardContent;
         private CharacterDto.GetCharacterInfo character;
         private Long boardUserIdx; //페이지네이션을 위한 인덱스

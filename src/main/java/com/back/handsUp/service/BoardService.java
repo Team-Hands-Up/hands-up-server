@@ -595,7 +595,7 @@ public class BoardService {
 
             BoardDto.ReceivedLikeInfo receivedLikeInfo = BoardDto.ReceivedLikeInfo.builder()
                     .emailFrom(boardUser.getUserIdx().getEmail())
-                    .text("아래 글에 "+boardUser.getUserIdx().getNickname()+"님이 관심있어요")
+                    .nickname(boardUser.getUserIdx().getNickname())
                     .boardContent(boardUser.getBoardIdx().getContent())
                     .LikeCreatedAt(boardUser.getCreatedAt())
                     .character(characterInfo)
