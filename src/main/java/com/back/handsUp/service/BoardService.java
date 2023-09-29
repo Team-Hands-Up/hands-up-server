@@ -169,17 +169,20 @@ public class BoardService {
                 tagName = null;
             } else tagName = opTagName.get();
 
-            BoardDto.GetBoardMap getBoardMap = BoardDto.GetBoardMap.builder()
-                    .boardIdx(b.getBoard().getBoardIdx())
-                    .nickname(b.getNickname())
-                    .character(b.getCharacter())
-                    .latitude(b.getBoard().getLatitude())
-                    .longitude(b.getBoard().getLongitude())
-                    .createdAt(b.getBoard().getCreatedAt())
-                    .tag(tagName)
-                    .build();
+            //위치 정보 true인 경우만 조회 가능
+            if (b.getBoard().getIndicateLocation().equals("true")) {
+                BoardDto.GetBoardMap getBoardMap = BoardDto.GetBoardMap.builder()
+                        .boardIdx(b.getBoard().getBoardIdx())
+                        .nickname(b.getNickname())
+                        .character(b.getCharacter())
+                        .latitude(b.getBoard().getLatitude())
+                        .longitude(b.getBoard().getLongitude())
+                        .createdAt(b.getBoard().getCreatedAt())
+                        .tag(tagName)
+                        .build();
 
-            getBoardsMapList.add(getBoardMap);
+                getBoardsMapList.add(getBoardMap);
+            }
         }
 
         BoardDto.GetBoardMapAndSchool getBoardMapAndSchool = BoardDto.GetBoardMapAndSchool.builder()
@@ -481,7 +484,12 @@ public class BoardService {
 
     private void checkLocationError(BoardDto.GetBoardInfo boardInfo) throws BaseException {
         if (boardInfo.getIndicateLocation().equals("true") && boardInfo.getLatitude() == 0.0 && boardInfo.getLongitude() == 0.0) {
-            throw new BaseException(BaseResponseStatus.LOCATION_ERROR);
+            throw new BaseException(LOCATION_TRUE_ERROR);
+        }
+
+        //위치 정보 false면 latitude, longitude는 무조건 0
+        if (boardInfo.getIndicateLocation().equals("false") && boardInfo.getLatitude() > 0 && boardInfo.getLongitude() > 0) {
+            throw new BaseException(LOCATION_FALSE_ERROR);
         }
 
         if (boardInfo.getMessageDuration() < 1 || boardInfo.getMessageDuration() > 48) {
