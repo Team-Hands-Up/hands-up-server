@@ -217,4 +217,16 @@ public class UserController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    @ResponseBody
+    @PostMapping("/initPw")
+    public BaseResponse<String> initPw(@RequestBody UserDto.ResEmail resEmail){
+        try {
+            this.mailService.initPw(resEmail.getEmail());
+            return new BaseResponse<>("임시 비밀번호 생성에 성공했습니다.");
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
 }
