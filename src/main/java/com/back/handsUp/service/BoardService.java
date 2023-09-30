@@ -66,7 +66,7 @@ public class BoardService {
 
         //조회하는 게시물
         Optional<Board> optionalBoard = this.boardRepository.findByBoardIdx(boardIdx);
-        if(optionalBoard.isEmpty()){
+        if (optionalBoard.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_BOARDIDX);
         }
         Board board = optionalBoard.get();
@@ -75,9 +75,9 @@ public class BoardService {
         Optional<BoardUser> optionalBoardUserEntity = boardUserRepository.findBoardUserByBoardIdxAndUserIdx(board, user);
 
         String didLike;
-        if(optionalBoardUserEntity.isEmpty()){
+        if (optionalBoardUserEntity.isEmpty()) {
             didLike = "false";
-        }else {
+        } else {
             BoardUser boardUserEntity = optionalBoardUserEntity.get();
             didLike = boardUserEntity.getStatus();
         }
@@ -89,14 +89,14 @@ public class BoardService {
 
         //게시글 작성자
         Optional<User> optionalBoardUser = this.boardUserRepository.findUserIdxByBoardIdxAndStatus(boardIdx, "WRITE");
-        if(optionalBoardUser.isEmpty()){
+        if (optionalBoardUser.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_BOARDUSERIDX);
         }
         User boardUser = optionalBoardUser.get();
 
         //태그
         Optional<Tag> optionalTag = this.boardTagRepository.findTagIdxByBoardIdx(boardIdx);
-        if(optionalTag.isEmpty()){
+        if (optionalTag.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_TAG_VALUE);
         }
         Tag tag = optionalTag.get();
@@ -161,7 +161,7 @@ public class BoardService {
 
         List<BoardDto.GetBoardMap> getBoardsMapList = new ArrayList<>();
 
-        for(BoardDto.BoardWithTag b : getBoards) {
+        for (BoardDto.BoardWithTag b : getBoards) {
 
             Optional<String> opTagName = this.boardTagRepository.findTagNameByBoard(b.getBoard());
             String tagName;
@@ -169,17 +169,20 @@ public class BoardService {
                 tagName = null;
             } else tagName = opTagName.get();
 
-            BoardDto.GetBoardMap getBoardMap = BoardDto.GetBoardMap.builder()
-                    .boardIdx(b.getBoard().getBoardIdx())
-                    .nickname(b.getNickname())
-                    .character(b.getCharacter())
-                    .latitude(b.getBoard().getLatitude())
-                    .longitude(b.getBoard().getLongitude())
-                    .createdAt(b.getBoard().getCreatedAt())
-                    .tag(tagName)
-                    .build();
+            //위치 정보 true인 경우만 조회 가능
+            if (b.getBoard().getIndicateLocation().equals("true")) {
+                BoardDto.GetBoardMap getBoardMap = BoardDto.GetBoardMap.builder()
+                        .boardIdx(b.getBoard().getBoardIdx())
+                        .nickname(b.getNickname())
+                        .character(b.getCharacter())
+                        .latitude(b.getBoard().getLatitude())
+                        .longitude(b.getBoard().getLongitude())
+                        .createdAt(b.getBoard().getCreatedAt())
+                        .tag(tagName)
+                        .build();
 
-            getBoardsMapList.add(getBoardMap);
+                getBoardsMapList.add(getBoardMap);
+            }
         }
 
         BoardDto.GetBoardMapAndSchool getBoardMapAndSchool = BoardDto.GetBoardMapAndSchool.builder()
@@ -211,7 +214,7 @@ public class BoardService {
 
         LocalDateTime currentTime = LocalDateTime.now();
 
-        for (BoardUser b: getSchoolBoards) {
+        for (BoardUser b : getSchoolBoards) {
             //시간 만료 체크
             Duration timeCheck = Duration.between(b.getBoardIdx().getCreatedAt(), currentTime);
 //            log.info("timecheck={}",timeCheck.getSeconds());
@@ -226,9 +229,10 @@ public class BoardService {
 
         return getBoards;
     }
+
     //게시물 조회 리스트,지도 중복 코드 - 태그, 캐릭터, 하트 관련
     private void addGetBoards(User user, List<BoardDto.BoardWithTag> getBoards, List<BoardUser> nonBlockBoards) {
-        for(BoardUser b1: nonBlockBoards){
+        for (BoardUser b1 : nonBlockBoards) {
 
             Character character = b1.getUserIdx().getCharacter();
             CharacterDto.GetCharacterInfo characterInfo = new CharacterDto.GetCharacterInfo(character.getEye(),
@@ -242,14 +246,14 @@ public class BoardService {
             Optional<String> opTagName = this.boardTagRepository.findTagNameByBoard(shownBoard);
             if (opTagName.isEmpty()) {
                 tagName = null;
-            }else tagName = opTagName.get();
+            } else tagName = opTagName.get();
 
             //like 확인
             Optional<BoardUser> opBoard = boardUserRepository.findBoardUserByBoardIdxAndUserIdx(shownBoard, user);
             String didLike;
-            if(opBoard.isEmpty()){
+            if (opBoard.isEmpty()) {
                 didLike = "false";
-            }else {
+            } else {
                 BoardUser boardUserEntity = opBoard.get();
                 didLike = boardUserEntity.getStatus();
             }
@@ -341,8 +345,9 @@ public class BoardService {
         return "해당 게시글에 좋아요를 눌렀습니다.";
 
     }
+
     //내 게시물 조회 페이징
-    public BoardDto.MyBoard viewMyBoard(Principal principal, Pageable pageable) throws BaseException{
+    public BoardDto.MyBoard viewMyBoard(Principal principal, Pageable pageable) throws BaseException {
 
         Optional<User> optionalUser = userRepository.findByEmailAndStatus(principal.getName(), "ACTIVE");
         if (optionalUser.isEmpty()) {
@@ -363,8 +368,6 @@ public class BoardService {
     }
 
 
-
-
     public void addBoard(Principal principal, BoardDto.GetBoardInfo boardInfo) throws BaseException {
 
         checkLocationError(boardInfo);
@@ -377,7 +380,7 @@ public class BoardService {
                 .location(boardInfo.getLocation())
                 .messageDuration(boardInfo.getMessageDuration())
                 .build();
-        try{
+        try {
             this.boardRepository.save(boardEntity);
             setTags(boardInfo, boardEntity);
         } catch (Exception e) {
@@ -385,7 +388,7 @@ public class BoardService {
         }
 
         Optional<User> optional = this.userRepository.findByEmailAndStatus(principal.getName(), "ACTIVE");
-        if(optional.isEmpty()){
+        if (optional.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_EMAIL);
         }
         User userEntity = optional.get();
@@ -394,7 +397,7 @@ public class BoardService {
                 .userIdx(userEntity)
                 .status("WRITE")
                 .build();
-        try{
+        try {
             this.boardUserRepository.save(boardUserEntity);
         } catch (Exception e) {
             throw new BaseException(DATABASE_INSERT_ERROR);
@@ -404,15 +407,15 @@ public class BoardService {
 
 
     //게시물 삭제
-    public void deleteBoard(Principal principal, Long boardIdx) throws BaseException{
+    public void deleteBoard(Principal principal, Long boardIdx) throws BaseException {
         Optional<User> optional = this.userRepository.findByEmailAndStatus(principal.getName(), "ACTIVE");
-        if(optional.isEmpty()){
+        if (optional.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_USERIDX);
         }
         User userEntity = optional.get();
 
         Optional<Board> myBoards = this.boardRepository.findByBoardIdx(boardIdx);
-        if(myBoards.isEmpty()){
+        if (myBoards.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_BOARDIDX);
         }
         Board myBoardsEntity = myBoards.get();
@@ -420,17 +423,17 @@ public class BoardService {
         Optional<BoardUser> boardUser = this.boardUserRepository.findBoardUserByBoardIdxAndStatus(myBoardsEntity, "WRITE").stream().findFirst();
 
         //게시물이 존재하는지 체크
-        if(boardUser.isEmpty()){
+        if (boardUser.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_BOARD_LIST);
         }
 
         //해당 게시물을 로그인한 유저가 작성했는지 체크
-        if(!Objects.equals(boardUser.get().getUserIdx().getUserIdx(), userEntity.getUserIdx())){
+        if (!Objects.equals(boardUser.get().getUserIdx().getUserIdx(), userEntity.getUserIdx())) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_BOARDUSERIDX);
         }
 
         //이미 삭제된 게시물인지 체크
-        if(myBoardsEntity.getStatus().equals("DELETE")){
+        if (myBoardsEntity.getStatus().equals("DELETE")) {
             throw new BaseException(BaseResponseStatus.ALREADY_DELETE_BOARD);
         }
 
@@ -440,39 +443,39 @@ public class BoardService {
 
     }
 
-    public void patchBoard(Principal principal, Long boardIdx, BoardDto.GetBoardInfo boardInfo) throws BaseException{
+    public void patchBoard(Principal principal, Long boardIdx, BoardDto.GetBoardInfo boardInfo) throws BaseException {
         checkLocationError(boardInfo);
 
         Optional<Board> optional = this.boardRepository.findByBoardIdx(boardIdx);
-        if(optional.isEmpty()){
+        if (optional.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_BOARDIDX);
         }
         Board boardEntity = optional.get();
 
 
         Optional<User> optional1 = this.userRepository.findByEmailAndStatus(principal.getName(), "ACTIVE");
-        if(optional1.isEmpty()){
+        if (optional1.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_EMAIL);
         }
         User userEntity = optional1.get();
 
         Optional<BoardUser> optionalBoardUser = this.boardUserRepository.findBoardUserByBoardIdxAndUserIdx(boardEntity, userEntity);
-        if(optionalBoardUser.isEmpty()){
+        if (optionalBoardUser.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_BOARDUSERIDX);
         }
 
         boardEntity.changeBoard(boardInfo.getContent(), boardInfo.getLatitude(), boardInfo.getLongitude(), boardInfo.getLocation(), boardInfo.getIndicateLocation(), boardInfo.getMessageDuration());
-        try{
+        try {
             this.boardRepository.save(boardEntity);
         } catch (Exception e) {
             throw new BaseException(DATABASE_INSERT_ERROR);
         }
 
         List<BoardTag> boardTagEntityList = this.boardTagRepository.findAllByBoardIdx(boardEntity);
-        for(BoardTag boardTag : boardTagEntityList){
+        for (BoardTag boardTag : boardTagEntityList) {
             boardTag.changeStatus("INACTIVE");
         }
-        try{
+        try {
             setTags(boardInfo, boardEntity);
         } catch (Exception e) {
             throw new BaseException(DATABASE_INSERT_ERROR);
@@ -480,11 +483,16 @@ public class BoardService {
     }
 
     private void checkLocationError(BoardDto.GetBoardInfo boardInfo) throws BaseException {
-        if(boardInfo.getIndicateLocation().equals("true") && boardInfo.getLatitude() == 0.0 && boardInfo.getLongitude() == 0.0){
-            throw new BaseException(BaseResponseStatus.LOCATION_ERROR);
+        if (boardInfo.getIndicateLocation().equals("true") && boardInfo.getLatitude() == 0.0 && boardInfo.getLongitude() == 0.0) {
+            throw new BaseException(LOCATION_TRUE_ERROR);
         }
 
-        if(boardInfo.getMessageDuration()<1 || boardInfo.getMessageDuration()>48){
+        //위치 정보 false면 latitude, longitude는 무조건 0
+        if (boardInfo.getIndicateLocation().equals("false") && boardInfo.getLatitude() > 0 && boardInfo.getLongitude() > 0) {
+            throw new BaseException(LOCATION_FALSE_ERROR);
+        }
+
+        if (boardInfo.getMessageDuration() < 1 || boardInfo.getMessageDuration() > 48) {
             throw new BaseException(BaseResponseStatus.MESSAGEDURATION_ERROR);
         }
     }
@@ -543,37 +551,37 @@ public class BoardService {
     }
 
     private void setTags(BoardDto.GetBoardInfo boardInfo, Board boardEntity) {
-            Optional<Tag> tagEntity = this.tagRepository.findTagByName(boardInfo.getTag());
-            Tag targetTag;
+        Optional<Tag> tagEntity = this.tagRepository.findTagByName(boardInfo.getTag());
+        Tag targetTag;
 
-            if(tagEntity.isEmpty()){
-                targetTag = Tag.builder()
-                        .name(boardInfo.getTag())
-                        .build();
-                this.tagRepository.save(targetTag);
-            } else {
-               targetTag = tagEntity.get();
+        if (tagEntity.isEmpty()) {
+            targetTag = Tag.builder()
+                    .name(boardInfo.getTag())
+                    .build();
+            this.tagRepository.save(targetTag);
+        } else {
+            targetTag = tagEntity.get();
 
-            }
+        }
 
-            Optional<BoardTag> optional = this.boardTagRepository.findByBoardIdxAndTagIdx(boardEntity, targetTag);
-            if(optional.isEmpty()){
-                BoardTag boardTagEntity = BoardTag.builder()
-                        .boardIdx(boardEntity)
-                        .tagIdx(targetTag)
-                        .build();
-                this.boardTagRepository.save(boardTagEntity);
+        Optional<BoardTag> optional = this.boardTagRepository.findByBoardIdxAndTagIdx(boardEntity, targetTag);
+        if (optional.isEmpty()) {
+            BoardTag boardTagEntity = BoardTag.builder()
+                    .boardIdx(boardEntity)
+                    .tagIdx(targetTag)
+                    .build();
+            this.boardTagRepository.save(boardTagEntity);
 
-            } else{
-                BoardTag boardTagEntity = optional.get();
-                boardTagEntity.changeStatus("ACTIVE");
-            }
+        } else {
+            BoardTag boardTagEntity = optional.get();
+            boardTagEntity.changeStatus("ACTIVE");
+        }
     }
 
     //받은 하트 목록 조회
-    public BoardDto.TotalReceivedLikeRes fetchReceivedLikePagesBy (Principal principal, int size, Long lastIdx) throws BaseException {
+    public BoardDto.TotalReceivedLikeRes fetchReceivedLikePagesBy(Principal principal, int size, Long lastIdx) throws BaseException {
         Optional<User> optional = this.userRepository.findByEmailAndStatus(principal.getName(), "ACTIVE");
-        if(optional.isEmpty()){
+        if (optional.isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_USERIDX);
         }
         User user = optional.get();
@@ -582,12 +590,12 @@ public class BoardService {
 
         //페이징 처리
         Page<BoardUser> boardUsers = fetchReceivedLikes(size, lastIdx, boardList);
-        if(boardUsers.getContent().isEmpty()){
+        if (boardUsers.getContent().isEmpty()) {
             throw new BaseException(BaseResponseStatus.NON_EXIST_LIKE_BOARDS);
         }
         //dto 생성
         List<BoardDto.ReceivedLikeInfo> receivedLikeInfoList = new ArrayList<>();
-        for(BoardUser boardUser: boardUsers.getContent()){
+        for (BoardUser boardUser : boardUsers.getContent()) {
             Character character = boardUser.getUserIdx().getCharacter();
             CharacterDto.GetCharacterInfo characterInfo = new CharacterDto.GetCharacterInfo(character.getEye(),
                     character.getEyeBrow(), character.getGlasses(), character.getNose(), character.getMouth(),
@@ -613,10 +621,11 @@ public class BoardService {
                 .build();
         return receivedLikeRes;
     }
+
     //받은 좋아요(하트) 목록 페이징으로 가져오기
-    private Page<BoardUser> fetchReceivedLikes(int size, Long lastIdx, List<Board> boardList){
+    private Page<BoardUser> fetchReceivedLikes(int size, Long lastIdx, List<Board> boardList) {
         PageRequest pageRequest = PageRequest.of(0, size); //페이지는 0으로 고정, 페이지에 표시되는 개수는 size로 결정
-        return lastIdx == null? boardUserRepository.findAllByStatusAndBoardIdxInOrderByBoardUserIdxDesc("LIKE", boardList, pageRequest):
+        return lastIdx == null ? boardUserRepository.findAllByStatusAndBoardIdxInOrderByBoardUserIdxDesc("LIKE", boardList, pageRequest) :
                 boardUserRepository.findByBoardUserIdxLessThanAndStatusAndBoardIdxInOrderByBoardUserIdxDesc(lastIdx, "LIKE", boardList, pageRequest);
     }
 

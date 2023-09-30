@@ -36,8 +36,9 @@ public enum BaseResponseStatus {
     ALREADY_DELETE_BOARD(false, 4020, "이미 삭제된 게시물입니다."),
 
 
-    LOCATION_ERROR(false, 4021, "위치정보에 오류가 발생했습니다."),
+    LOCATION_TRUE_ERROR(false, 4021, "indicate_location이 true이면 위,경도는 0이면 안됩니다."),
     MESSAGEDURATION_ERROR(false, 4022, "메세지 지속시간에 오류가 발생했습니다."),
+    LOCATION_FALSE_ERROR(false, 4023, "indicate_location이 false이면 위,경도는 0이어야 합니다."),
 
     NON_EXIST_CHARACTER_VALUE(false, 4031, "캐릭터 생성에 필요한 값이 모두 입력되지 않았습니다."),
 
