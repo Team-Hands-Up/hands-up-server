@@ -73,7 +73,7 @@ private MimeMessage createMessage(String code, String emailTo, String title, Str
         // 메일 내용 메일의 subtype을 html로 지정하여 html문법 사용 가능
         String msg="";
         msg += "<head> <link href=\'http://fonts.googleapis.com/css?family=Roboto\' rel=\'stylesheet\' type=\'text/css\'></head>";
-        msg += "<div style=\"text-align: center; margin: 20px;\"> <img src=\"https://handsupbucket.s3.ap-northeast-2.amazonaws.com/image/handsUpLogo_orange_2x.png\"></div>";
+        msg += "<div style=\"text-align: center; margin: 20px;\"> <img src=\"https://hands-up-bucket.s3.ap-northeast-2.amazonaws.com/image/handsUpLogo_orange_2x.png\"></div>";
         msg +="<hr size=\"1px\" color=\"#DBDBDB\">";
         msg += "<h1 style=\"font-size: 16px; text-align: center;  margin-top: 40px; color: #111111; font-family: 'Roboto'; font-weight: 600;\">이메일 주소 확인</h1>";
         msg += "<div style=\"font-size: 12px; text-align: center; color: #747474; font-family: 'Roboto'; font-weight: 400;\">";
