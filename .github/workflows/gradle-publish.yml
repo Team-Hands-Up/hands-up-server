@@ -14,7 +14,7 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  S3_BUCKET_NAME: handsupbucket
+  S3_BUCKET_NAME: hands-up-bucket
   CODE_DEPLOY_APPLICATION_NAME: hands-up-codedeploy-app
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: hands-up-codedeploy-deployment-group
 
