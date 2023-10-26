@@ -2,7 +2,6 @@ package com.back.handsUp.dto.user;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Builder

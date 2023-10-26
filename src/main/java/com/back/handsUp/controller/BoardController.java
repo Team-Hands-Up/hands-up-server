@@ -75,17 +75,6 @@ public class BoardController {
         }
     }
 
-    //본인 게시글 조회
-    // @GetMapping("/myBoards")
-    // public BaseResponse<BoardDto.MyBoard> viewMyBoard(Principal principal) {
-    //     try {
-    //         BoardDto.MyBoard myBoards = boardService.viewMyBoard(principal);
-    //         return new BaseResponse<>(myBoards);
-    //     } catch (BaseException e) {
-    //         return new BaseResponse<>(e.getStatus());
-    //     }
-    // }
-
     @GetMapping("/myBoards")
     public BaseResponse<BoardDto.MyBoard> viewMyBoard(
             Principal principal,

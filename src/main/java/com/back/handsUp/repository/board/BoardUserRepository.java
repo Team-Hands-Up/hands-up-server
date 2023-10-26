@@ -17,8 +17,6 @@ import java.util.Optional;
 @Repository
 public interface BoardUserRepository extends JpaRepository<BoardUser, Long> {
 
-    Optional<BoardUser> findBoardUserByBoardIdx(Board boardIdx);
-
     @Query("select b.boardIdx from BoardUser b where b.userIdx = ?1 and b.status = ?2")
     List<Board> findBoardIdxByUserIdxAndStatus(User userIdx, String status);
 
@@ -36,9 +34,6 @@ public interface BoardUserRepository extends JpaRepository<BoardUser, Long> {
     @Query("select b from BoardUser b where b.boardIdx.status = 'ACTIVE' and b.status= 'WRITE' and b.boardIdx not in (select bu.boardIdx from BoardUser bu where bu.userIdx =?1 and bu.status='BLOCK') order by b.boardUserIdx desc")
     List<BoardUser> findNotBlockedBoardsByUserIdx(User userIdx);
 
-    @Query("select b from BoardUser b where b.boardIdx.status = 'ACTIVE' and b.status= 'WRITE' and b.boardIdx not in (select bu.boardIdx from BoardUser bu where bu.userIdx =?1 and bu.status='BLOCK') order by b.boardUserIdx desc")
-    Page<BoardUser> findNotBlockedBoardsByUserIdxWithPage(User userIdx, Pageable page);
-
     List<BoardUser> findBoardUserByBoardIdxAndStatus(Board boardIdx, String status);
 
     Page<BoardUser> findByBoardUserIdxLessThanAndStatusAndBoardIdxInOrderByBoardUserIdxDesc(Long boardUserIdx, String status, List<Board> boardList, PageRequest pageRequest);
@@ -47,8 +42,6 @@ public interface BoardUserRepository extends JpaRepository<BoardUser, Long> {
 
     @Query("select bu.boardIdx from BoardUser bu inner join Board b  on b.boardIdx = bu.boardIdx.boardIdx where bu.userIdx = ?1 and bu.status = ?2 and b.status = ?3 ")
     Page<Board> findBoardIdxByUserIdxAndStatusInOrderByBoardUserIdxDesc(User userIdx, String status, String boardStatus, Pageable pageable);
-
-    Page<BoardUser> findByUserIdxAndStatus(User userIdx, String status, Pageable pageable);
 
     Optional<BoardUser> findByUserIdxAndBoardIdxAndStatus(User userIdx, Board boardIdx, String status);
 

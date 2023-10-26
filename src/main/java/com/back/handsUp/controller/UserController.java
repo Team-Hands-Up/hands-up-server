@@ -2,10 +2,7 @@ package com.back.handsUp.controller;
 
 import com.back.handsUp.baseResponse.BaseException;
 import com.back.handsUp.baseResponse.BaseResponse;
-import com.back.handsUp.baseResponse.BaseResponseStatus;
-import com.back.handsUp.domain.Notification;
 import com.back.handsUp.domain.user.Character;
-import com.back.handsUp.domain.user.User;
 import com.back.handsUp.dto.NotificationResponse;
 import com.back.handsUp.dto.fcmToken.FcmTokenDto;
 import com.back.handsUp.dto.jwt.TokenDto;

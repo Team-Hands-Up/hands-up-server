@@ -1,12 +1,10 @@
 package com.back.handsUp.dto.chat;
 
 import com.back.handsUp.domain.board.Board;
-import com.back.handsUp.domain.chat.ChatRoom;
 import com.back.handsUp.domain.user.Character;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @NoArgsConstructor
 public class ChatDto {

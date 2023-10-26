@@ -2,8 +2,6 @@ package com.back.handsUp.controller;
 
 import com.back.handsUp.baseResponse.BaseException;
 import com.back.handsUp.baseResponse.BaseResponse;
-import com.back.handsUp.domain.inquiry.Inquiry;
-import com.back.handsUp.domain.report.Report;
 import com.back.handsUp.dto.inquiryAndReport.InquiryDto;
 import com.back.handsUp.dto.inquiryAndReport.ReportDto;
 import com.back.handsUp.service.InquiryReportService;

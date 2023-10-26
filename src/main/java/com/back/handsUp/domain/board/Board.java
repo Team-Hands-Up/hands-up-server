@@ -1,6 +1,5 @@
 package com.back.handsUp.domain.board;
 
-import com.back.handsUp.domain.user.User;
 import com.back.handsUp.dto.board.BoardPreviewRes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;

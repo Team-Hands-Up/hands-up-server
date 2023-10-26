@@ -1,7 +1,6 @@
 package com.back.handsUp.service.jwt;
 
 import com.back.handsUp.domain.user.User;
-import com.back.handsUp.dto.user.UserDto;
 import com.back.handsUp.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

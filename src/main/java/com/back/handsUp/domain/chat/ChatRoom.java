@@ -1,6 +1,5 @@
 package com.back.handsUp.domain.chat;
 
-import com.back.handsUp.baseResponse.BaseEntity;
 import com.back.handsUp.domain.board.Board;
 import com.back.handsUp.domain.user.User;
 import lombok.Builder;

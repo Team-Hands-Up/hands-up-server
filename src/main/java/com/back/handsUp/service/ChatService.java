@@ -9,10 +9,8 @@ import com.back.handsUp.domain.board.Board;
 import com.back.handsUp.domain.board.BoardUser;
 import com.back.handsUp.domain.chat.ChatRoom;
 import com.back.handsUp.domain.fcmToken.FcmToken;
-import com.back.handsUp.domain.user.Character;
 import com.back.handsUp.domain.user.User;
 import com.back.handsUp.dto.chat.ChatDto;
-import com.back.handsUp.dto.user.UserDto;
 import com.back.handsUp.repository.NotificationRepository;
 import com.back.handsUp.repository.board.BoardRepository;
 import com.back.handsUp.repository.board.BoardTagRepository;
@@ -24,15 +22,11 @@ import com.back.handsUp.utils.FirebaseCloudMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -76,18 +70,6 @@ public class ChatService {
             throw new BaseException(NON_EXIST_USERIDX);
         }
         User writer = opWriter.get();
-
-//        Optional<ChatRoom> optional1 = this.chatRoomRepository.findChatRoomByChatRoomKey(chatRoomKey);
-//        Optional<ChatRoom> optional1 = this.chatRoomRepository.findChatRoomByBoardIdx(board);
-//        if(optional1.isEmpty()){
-//            throw new BaseException(BaseResponseStatus.NON_EXIST_CHATROOMIDX);
-//        }
-//        ChatRoom chatRoom = optional1.get();
-
-//        if(loginUser.equals(chatRoom.getHostUserIdx()) || loginUser.equals(chatRoom.getSubUserIdx())){
-//        } else {
-//            throw new BaseException(BaseResponseStatus.NON_EXIST_CHATROOM_USER);
-//        }
 
         //차단 확인
         Optional<BoardUser> blockBoard = this.boardUserRepository.findByUserIdxAndBoardIdxAndStatus(loginUser, board, "BLOCK");

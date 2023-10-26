@@ -1,7 +1,6 @@
 package com.back.handsUp.repository.fcm;
 
 import com.back.handsUp.domain.fcmToken.FcmToken;
-import com.back.handsUp.domain.report.Report;
 import com.back.handsUp.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

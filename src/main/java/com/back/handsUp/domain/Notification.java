@@ -1,8 +1,6 @@
 package com.back.handsUp.domain;
 
 import com.back.handsUp.baseResponse.BaseEntity;
-import com.back.handsUp.baseResponse.BaseException;
-import com.back.handsUp.baseResponse.BaseResponseStatus;
 import com.back.handsUp.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;

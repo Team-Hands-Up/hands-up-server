@@ -2,11 +2,7 @@ package com.back.handsUp.controller;
 
 import com.back.handsUp.baseResponse.BaseException;
 import com.back.handsUp.baseResponse.BaseResponse;
-import com.back.handsUp.domain.board.Board;
-import com.back.handsUp.domain.chat.ChatMessage;
 import com.back.handsUp.dto.chat.ChatDto;
-import com.back.handsUp.dto.user.UserDto;
-import com.back.handsUp.service.BoardService;
 import com.back.handsUp.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +18,6 @@ import java.util.List;
 @RestController
 public class ChatController {
     private final ChatService chatService;
-    private final BoardService boardService;
     //채팅방 내 게시글 미리보기
     @ResponseBody
     @GetMapping("/{boardIdx}")
