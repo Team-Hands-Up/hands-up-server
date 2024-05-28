@@ -38,14 +38,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-          
-#      - name: Copy secret
-#        env:
-#          OCCUPY_SECRET: ${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }}
-#          OCCUPY_SECRET_DIR: src/main/resources/
-#          OCCUPY_SECRET_DIR_FILE_NAME: jasypt-encryptor-password.txt
-#        run: echo $OCCUPY_SECRET | base64 -di > $OCCUPY_SECRET_DIR/$OCCUPY_SECRET_DIR_FILE_NAME
-
       
       - uses: actions/checkout@v3
       - run: touch ./src/main/resources/firebase/handsup-9c9e7-firebase-adminsdk-ow0l5-6bb4cd6c8c.json
